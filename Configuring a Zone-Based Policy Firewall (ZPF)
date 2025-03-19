@@ -1,0 +1,35 @@
+//Same for all router from line 2 to 21
+//enter set of code till exit in cli and then enter
+
+line console 0
+password conpa55
+login
+exit
+
+line vty 0 4
+password vtypa55
+login
+exit
+
+enable secret enpa55
+exit
+
+ip domain-name ccnasecurity.com
+username admin secret adminpa55
+line vty 0 4
+login local
+exit
+
+crypto key generate rsa
+
+//for router 1
+ip route 10.2.2.0 255.255.255.252 10.1.1.2
+ip route 192.168.3.0 255.255.255.0 10.1.1.2
+
+//for router 2
+ip route 192.168.1.0 255.255.255.0 10.1.1.1
+ip route 192.168.3.0 255.255.255.0 10.2.2.1
+
+//for router 3
+ip route 192.168.1.0 255.255.255.0 10.2.2.2
+ip route 10.1.1.0 255.255.255.252 10.2.2.2
