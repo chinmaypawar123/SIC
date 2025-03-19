@@ -1,35 +1,98 @@
-//Same for all router from line 2 to 21
-//enter set of code till exit in cli and then enter
+ Configure Router:
+//Execute command on all routers
+R(config) # line console 0
+R(config-line) #password conpa55
+R(config-line) #login
 
-line console 0
-password conpa55
-login
-exit
+//Execute command on all routers
+R(config)# line vty 0 4
+R(config-line)# password vtypa55
+R(config-line)# login
+R(config) # enable secret enpa55
 
-line vty 0 4
-password vtypa55
-login
-exit
+//Execute command on all routers
+R(config)# ip domain-name ccnasecurity.com
+R(config)# username admin secret adminpa55
+R(config)# line vty 0 4
+R(config-line)# login local
+R(config-line)# crypto key generate rsa
+How many bits in the modulus [512]: 1024
 
-enable secret enpa55
-exit
+//Execute command on all routers
+R(config)#ip route destination-network-address subnetmask next-hopdestination-address
 
-ip domain-name ccnasecurity.com
-username admin secret adminpa55
-line vty 0 4
-login local
-exit
 
-crypto key generate rsa
+//Part 2: Verify Basic Network Connectivity
 
-//for router 1
-ip route 10.2.2.0 255.255.255.252 10.1.1.2
-ip route 192.168.3.0 255.255.255.0 10.1.1.2
+PCA>ping 192.168.3.3
+(Successful)
+PCC>ssh –l admin 10.2.2.2
+Password:adminpa55
+R2>exit
+//Desktop -> Web Browser
+URL: http://192.168.1.3
+(Successful)
+R3# show version
+R3(config)# license boot module c1900 technology-package securityk9
+R3#copy run start
+R3# reload
+R3# show version
+R3(config)# zone security IN-ZONE
+R3(config-sec-zone)# exit
+R3(config)# zone security OUT-ZONE
+R3(config-sec-zone)# exit
 
-//for router 2
-ip route 192.168.1.0 255.255.255.0 10.1.1.1
-ip route 192.168.3.0 255.255.255.0 10.2.2.1
 
-//for router 3
-ip route 192.168.1.0 255.255.255.0 10.2.2.2
-ip route 10.1.1.0 255.255.255.252 10.2.2.2
+//Part 4: Identify Traffic Using a Class-Map
+R3(config)# access-list 101 permit ip 192.168.3.0 0.0.0.255 any
+R3(config)# class-map type inspect match-all IN-NET-CLASS-MAP
+R3(config-cmap)# match access-group 101
+R3(config-cmap)# exit
+
+
+//Part 5: Specify Firewall Policies
+R3(config)# policy-map type inspect IN-2-OUT-PMAP
+R3(config-pmap)# class type inspect IN-NET-CLASS-MAP
+R3(config-pmap-c)# inspect
+R3(config-pmap-c)# exit
+R3(config-pmap)# exit
+
+
+//Part 6: Apply Firewall Policies
+R3(config)# zone-pair security IN-2-OUT-ZPAIR source IN-ZONE destination OUTZONE
+R3(config-sec-zone-pair)# service-policy type inspect IN-2-OUT-PMAP
+R3(config-sec-zone-pair)# exit
+R3(config)#
+R3(config)# int g0/0
+R3(config-if)# zone-member security IN-ZONE
+R3(config-if)# exit
+R3(config)# int s0/1/0
+R3(config-if)# zone-member security OUT-ZONE
+R3(config-if)# exit
+R3# copy run start
+R3# reload
+
+
+//Part 7: Test Firewall Functionality from IN-ZONE to OUT ZONE
+PCC>ping 192.168.1.3
+(Successful)
+PCC>ssh –l admin 10.2.2.2
+Password:
+R2>
+R3# show policy-map type inspect zone-pair sessions
+Session 175216232 (192.168.3.3:1028)=>(10.2.2.2:22) tcp
+SIS_OPEN/TCP_ESTAB
+R2>exit
+//Desktop -> Web Browser
+URL: http://192.168.1.3
+(Successful)
+R3# show policy-map type inspect zone-pair sessions
+Session 565266624 (192.168.3.3:1031)=>(192.168.1.3:80) tcp
+SIS_OPEN/TCP_ESTAB
+
+
+//Part 8: Test Firewall Functionality from OUT-ZONE to INZONE
+PCA>ping 192.168.3.3
+(Unsuccessful – Request timed out)
+R2# ping 192.168.3.3
+(Unsuccessful – Request timed out)
