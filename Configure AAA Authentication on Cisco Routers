@@ -79,3 +79,17 @@ aaa new-model
 aaa authentication login default group radius local
 line console 0 
 login authentication default
+
+
+Username: Admin1
+Password: admin1pa55
+R1>
+
+Username: Admin2
+Password: admin2pa55
+R2>
+
+Username: Admin3
+Password: admin3pa55
+R3>
+
