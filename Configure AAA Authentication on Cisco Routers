@@ -37,57 +37,52 @@ network 192.168.3.0 0.0.0 area 0
 network 10.2.2.0 0.0.0.255 area 0
 
 objective 20 marks
-!!!Script for R1
-!!!Part 1 
-config t 
-username Admin1
-secret admin1pa55 
-aaa new-model 
-aaa authentication login default local
-line console 0
-login authentication default
+//Configure Local AAA Authentication for Console Access on R1//
 
-!!!Part 2
-ip domain-name ccnasecurity.com 
-crypto key generate rsa 1024
-aaa authentication login SSH-LOGIN local
-line vty 0 4 
-login authentication SSH-LOGIN 
-transport input ssh 
-
-!!!!Script for R2
-conf t
-username Admin2 
-secret admin2pa55
-tacacs-server host 192.168.2.2
-tacacs-server key tacacspa55 
-aaa new-model
-aaa authentication login default group tacacs+ local
-line console 0 l
-ogin authentication default
-
-
-!!!!Script for R3
-
-conf t 
-username Admin3 
-secret admin3pa55 
-radius-server host 192.168.3.2
-
-radius-server key radiuspa55 
-aaa new-model 
-aaa authentication login default group radius local
-line console 0 
-login authentication default
-
-
+R1(config)# username Admin1 secret admin1pa55
+R1(config)# aaa new-model
+R1(config)# aaa authentication login default local
+R1(config-line)# end
+R1# exit
 Username: Admin1
 Password: admin1pa55
 R1>
 
+//Configure Local AAA Authentication for vty Lines on R1//
+
+R1(config)# ip domain-name ccnasecurity.com
+R1(config)# crypto key generate rsa
+R1(config)# aaa authentication login SSH-LOGIN local
+R1(config)# line vty 0 4
+R1(config-line)# login authentication SSH-LOGIN
+R1(config-line)# transport input ssh R1(config-line)#
+end
+
+PC> ssh –l Admin1 192.168.1.1
+Open
+Password: admin1pa55
+
+//Configure Server-Based AAA Authentication Using TACACS+ on R2//
+R2(config)# username Admin2 secret admin2pa55
+R2(config)# aaa new-model
+R2(config)# aaa authentication login default group tacacs+ local
+R2(config)# line console 0
+R2(config-line)# login authentication default
+R2(config-line)# end
+R2# exit
 Username: Admin2
 Password: admin2pa55
 R2>
+
+
+//Configure Server-Based AAA Authentication Using Radius on R3//
+R3(config) # username Admin3 secret admin3pa55
+R3(config)# aaa new-model
+R3(config)# aaa authentication login default group radius local
+R3(config)# line console 0
+R3(config-line)# login authentication default
+R3(config-line)# end
+R3# exit
 
 Username: Admin3
 Password: admin3pa55
