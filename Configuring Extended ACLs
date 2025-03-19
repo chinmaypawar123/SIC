@@ -1,0 +1,70 @@
+Part A
+
+R1->
+en
+config
+access-list 100 permit tcp 172.22.34.64 0.0.0.31 host 172.22.34.62 eq ftp
+R1(config)->
+interface gigabitEthernet 0/0
+ip access-group 100 in
+ip access-list entended HTTP_ONLY
+Permit tcp 172.22.34.96 0.0.0.15 host 172.22.34.64 eq www
+en
+R1(config)# interface gigabitEthernet 0/1
+R1(config-if)# ip access-group HTTP_ONLY in
+
+//In PC 1-> desktop -> command prompt
+Ftp 172.22.34.62
+username: cisco
+password: cisco
+
+//in PC2 -> desktop-> web browser
+IP:www Access
+(172.22.34.62)->Go
+Write above ip address in url web browser
+
+//PART B
+//SWA->CLI
+int Vlan 1
+ip address 10.101.117.50 255.255.255.240
+no shutdown
+ip default-gateway 10.1.1.117.49
+
+SWB -> 
+en
+config
+int Vlan 1
+ip address 10.101.117.34 255.255.255.240
+no shutdown
+ip default-gateway 10.101.117.33
+
+SWC->
+int Vlan 1
+ip address 10.101.117.2 255.255.255.240
+no shutdown
+ip dafault-gateway 10.101.117.1
+
+securing switches
+
+SWA ->
+en
+config
+enable Secret empa55
+line Console O
+Password Conpa55
+
+SWB ->
+en
+config
+enable Secret empa55
+line Console O
+Password Conpa55
+login
+
+SWC-> 
+en
+config
+enable Secret empa55
+line Console O
+Password Conpa55
+login
