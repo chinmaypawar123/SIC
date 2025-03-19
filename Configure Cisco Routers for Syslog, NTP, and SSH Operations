@@ -1,6 +1,6 @@
-Commands First 20 marks practical
+//Commands First 20 marks practical
 
-"R1"
+//"R1"
 
 en
 config
@@ -8,14 +8,14 @@ router OSPF 1
 network 192.168.1.0 0.0.0.225 area 0
 network 10.1.1.0 0.0.0.3 area 0
 
-"R2"
+//"R2"
 
 en config
 router OSPF 2
 network 10.1.1.0 0.0.0.3 area 0
 network 10.2.2.0 0.0.0.3 area 0
 
-"R3"
+//"R3"
 
 en
 config
@@ -23,3 +23,57 @@ router OSPF 3
 network 192.168.3.0 0.0.0.255 area 0
 network 10.2.2.0 0.0.0.3 area 0
 
+//Objective 20 marks
+
+R1(config)# router ospf 1
+R1(config-router)# area 0 authentication message-digest
+R2(config)# router ospf 1
+R2(config-router)# area 0 authentication message-digest
+R3(config)# router ospf 1
+R3(config-router)# area 0 authentication message-digest
+
+R2(config)# interface s0/0/0
+R2(config-if)# ip ospf message-digest-key 1 md5 MD5pa55
+R2(config-if)# interface s0/0/1
+R2(config-if)# ip ospf message-digest-key 1 md5 MD5pa55
+R3(config)# interface s0/0/1
+R3(config-if)# ip ospf message-digest-key 1 md5 MD5pa55
+
+R1(config)# ntp server 192.168.1.5
+R2(config)# ntp server 192.168.1.5
+R3(config)# ntp server 192.168.1.5
+
+R1(config)# ntp update-calendar
+R2(config)# ntp update-calendar
+R3(config)# ntp update-calendar
+
+R1(config)# ntp authenticate
+R1(config)# ntp trusted-key 1
+R1(config)# ntp authentication-key 1 md5 NTPpa55
+R2(config)# ntp authenticate
+R2(config)# ntp trusted-key 1
+R2(config)# ntp authentication-key 1 md5 NTPpa55
+R3(config)# ntp authenticate
+R3(config)# ntp trusted-key 1
+R3(config)# ntp authentication-key 1 md5 NTPpa55
+
+R1(config)# service timestamps log datetime msec
+R2(config)# service timestamps log datetime msec
+R3(config)# service timestamps log datetime msec
+
+R1(config)# logging host 192.168.1.6
+R2(config)# logging host 192.168.1.6
+R3(config)# logging host 192.168.1.6
+
+R3(config)# ip domain-name ccnasecurity.com
+R3(config)# username SSHadmin privilege 15 secret ciscosshpa55
+
+R3(config)# line vty 0 4
+R3(config-line)# login local
+R3(config-line)# transport input ssh
+
+R3(config)# crypto key zeroize rsa
+
+R3(config)# ip ssh time-out 90
+R3(config)# ip ssh authentication-retries 2
+R3(config)# ip ssh version 2
